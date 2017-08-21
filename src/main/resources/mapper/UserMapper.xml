@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bohaisoft.dal.mapper.UserMapper" >
+	<resultMap id="BaseResultMap" type="com.bohaisoft.dal.model.User">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+	</resultMap>
+	
+   <select id="getUserById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id,name
+    from t
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+   <select id="getMasterUserById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id,name
+    from t
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+</mapper>

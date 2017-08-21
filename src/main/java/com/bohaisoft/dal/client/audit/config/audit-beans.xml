@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="yccConfigurer"
+		class="com.yihaodian.configcentre.client.utils.YccGlobalPropertyConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>dalclient_common.properties</value>
+			</list>
+		</property>
+		<property name="poolId">
+			<value>yihaodian/common</value>
+		</property>
+		<property name="envOverride">
+			<value>false</value>
+		</property>
+	</bean>
+
+	<bean id="messageService" class="com.yihaodian.ydal.client.audit.message.JumperMQSender">
+		<property name="queueName" value="${jumper.queueName}"></property>
+		<property name="enable" value="${jumper.enable}"></property>
+	</bean>
+	
+</beans>

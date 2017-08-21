@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bohaisoft.dal.mapper.StockMapper" >
+    <resultMap id="BaseResultMap" type="com.bohaisoft.dal.model.Stock">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+        <result column="product_id" property="productId" jdbcType="BIGINT" />
+        <result column="stock_num" property="stockNum" jdbcType="BIGINT" />
+    </resultMap>
+
+    <select id="selectMerchantStockByMerchantId" resultMap="BaseResultMap" parameterType="com.bohaisoft.dal.model.StockDTO" >
+        select *
+        from TEST_STOCK
+        where merchant_id = #{merchantId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectMerchantStockByMerchantIds" resultMap="BaseResultMap" parameterType="java.util.List">
+        select *
+        from TEST_STOCK
+        where merchant_id in
+        <foreach collection="list" item="stockDTO" index="index" open="(" separator="," close=")">
+          #{stockDTO.merchantId,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <select id="getMerchantStocksByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT * from TEST_STOCK WHERE merchant_id = #{merchantId,jdbcType=BIGINT}
+    </select>
+    
+    <update id="updateStockNumByDto" parameterType="com.bohaisoft.dal.model.StockDTO">
+        UPDATE TEST_STOCK
+        set stock_num = #{stockNum,jdbcType=BIGINT}
+        WHERE merchant_id = #{merchantId,jdbcType=BIGINT}
+        and product_id = #{productId,jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertStockNumByDto" parameterType="com.bohaisoft.dal.model.StockDTO">
+        INSERT TEST_STOCK (merchant_id,product_id,stock_num)
+        VALUES(#{merchantId,jdbcType=BIGINT},#{productId,jdbcType=BIGINT},#{stockNum,jdbcType=BIGINT})
+    </insert>
+
+</mapper>

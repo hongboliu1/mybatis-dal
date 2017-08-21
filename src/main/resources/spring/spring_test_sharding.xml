@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd         
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd         
+          http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd         
+          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd         
+          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<!-- 分库分表管理器 -->
+	<bean id="shardingService" class="com.bohaisoft.dal.client.router.impl.ShardingFacadeImpl">
+		<property name="shardingRuleContainer" ref="shardingRuleContainer" />
+	</bean>
+
+	<!-- 配置分库分表 -->
+	<bean id="shardingRuleContainer"
+		  class="com.bohaisoft.dal.client.router.config.dataobject.ShardingRuleContainer">
+		<property name="verticalShardingRules" ref="verticalDbLookupMapping" />
+		<property name="horizontalShardingRules">
+			<map>
+				<entry key="TEST_STOCK">
+					<bean
+							class="com.bohaisoft.dal.client.router.config.dataobject.ShardingRuleOfTable">
+						<property name="dbType" value="MYSQL" />
+						<property name="tbRuleList">
+							<list>
+								<ref bean="simpleTbLookupShardingRule_stock" />
+								<ref bean="consistentTbHashShardingRule_stock" />
+							</list>
+						</property>
+						<property name="dbRuleList">
+							<list>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				<entry key="TEST_PRICE">
+					<bean
+							class="com.bohaisoft.dal.client.router.config.dataobject.ShardingRuleOfTable">
+						<property name="dbType" value="MYSQL" />
+						<property name="tbRuleList">
+							<list>
+								<ref bean="simpleTbLookupShardingRule_price" />
+								<ref bean="simpleTbHashShardingRule_price" />
+							</list>
+						</property>
+						<property name="dbRuleList">
+							<list>
+								<ref bean="simpleDbLookupShardingRule_price" />
+								<ref bean="simpleDbHashShardingRule_price" />
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- 垂直分库规则映射 -->
+	<bean id="verticalDbLookupMapping" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry>
+					<key>
+						<value>group_user1</value>
+					</key>
+					<set>
+						<value>TEST_STOCK_1</value>
+						<value>TEST_STOCK_2</value>
+						<value>TEST_STOCK_3</value>
+						<value>TEST_STOCK_4</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>group_user2</value>
+					</key>
+					<set>
+						<value>TEST_STOCK_5</value>
+						<value>TEST_STOCK_6</value>
+						<value>TEST_STOCK_7</value>
+						<value>TEST_STOCK_8</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>group_user3</value>
+					</key>
+					<set>
+						<value>TEST_STOCK_9</value>
+						<value>TEST_STOCK_10</value>
+						<value>TEST_STOCK_11</value>
+						<value>TEST_STOCK_12</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- 简单lookup分库规则-price -->
+	<bean id="simpleDbLookupShardingRule_price"
+		  class="com.bohaisoft.dal.client.router.rule.SimpleLookupShardingRule">
+		<property name="ruleExp">
+			<value>#merchantId#</value>
+		</property>
+		<property name="lookupRules" ref="horizontalDbLookupMapping_price" />
+	</bean>
+
+	<!-- 水平分库规则映射-price -->
+	<bean id="horizontalDbLookupMapping_price" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry>
+					<key>
+						<value>group_user1</value>
+					</key>
+					<set>
+						<value>1</value>
+						<value>4</value>
+						<value>7</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>group_user2</value>
+					</key>
+					<set>
+						<value>2</value>
+						<value>5</value>
+						<value>8</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>group_user3</value>
+					</key>
+					<set>
+						<value>3</value>
+						<value>6</value>
+						<value>9</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- 简单hash分库规则-price -->
+	<bean id="simpleDbHashShardingRule_price"
+		  class="com.bohaisoft.dal.client.router.rule.SimpleHashShardingRule">
+		<property name="ruleExp">
+			<value>"group_user"+((#merchantId#+#productId#)%12+1)</value>
+		</property>
+	</bean>
+
+
+	<!-- 简单lookup分表规则-price -->
+	<bean id="simpleTbLookupShardingRule_price"
+		  class="com.bohaisoft.dal.client.router.rule.SimpleLookupShardingRule">
+		<property name="ruleExp">
+			<value>#merchantId#</value>
+		</property>
+		<property name="lookupRules" ref="horizontalTbLookupMapping_price" />
+	</bean>
+
+	<!-- 水平分表规则映射-price -->
+	<bean id="horizontalTbLookupMapping_price" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry>
+					<key>
+						<value>TEST_PRICE_1</value>
+					</key>
+					<set>
+						<value>1</value>
+						<value>2</value>
+						<value>3</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>TEST_PRICE_2</value>
+					</key>
+					<set>
+						<value>4</value>
+						<value>5</value>
+						<value>6</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- 简单hash分表规则-price-->
+	<bean id="simpleTbHashShardingRule_price"
+		  class="com.bohaisoft.dal.client.router.rule.SimpleHashShardingRule">
+		<property name="ruleExp">
+			<value>"TEST_PRICE_"+((#merchantId#)%3+1)</value>
+		</property>
+	</bean>
+
+	<!-- 一致性hash分表规则-stock -->
+	<bean id="consistentTbHashShardingRule_stock"
+		  class="com.bohaisoft.dal.client.router.rule.ConsistentHashShardingRule">
+		<property name="ruleExp">
+			<value>#merchantId#</value>
+		</property>
+		<property name="nodes">
+			<set>
+				<value>TEST_STOCK_2</value>
+				<value>TEST_STOCK_3</value>
+				<value>TEST_STOCK_4</value>
+				<value>TEST_STOCK_6</value>
+				<value>TEST_STOCK_7</value>
+				<value>TEST_STOCK_8</value>
+				<value>TEST_STOCK_10</value>
+				<value>TEST_STOCK_11</value>
+				<value>TEST_STOCK_12</value>
+			</set>
+		</property>
+		<property name="numberOfReplicas">
+			<value>1</value>
+		</property>
+	</bean>
+
+	<!-- 简单lookup分表规则-stock -->
+	<bean id="simpleTbLookupShardingRule_stock"
+		  class="com.bohaisoft.dal.client.router.rule.SimpleLookupShardingRule">
+		<property name="ruleExp">
+			<value>#merchantId#</value>
+		</property>
+		<property name="lookupRules" ref="horizontalTbLookupMapping_stock" />
+	</bean>
+
+	<!-- 水平分表规则映射-stock -->
+	<bean id="horizontalTbLookupMapping_stock" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry>
+					<key>
+						<value>TEST_STOCK_1</value>
+					</key>
+					<set>
+						<value>1</value>
+						<value>4</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>TEST_STOCK_5</value>
+					</key>
+					<set>
+						<value>2</value>
+						<value>5</value>
+					</set>
+				</entry>
+				<entry>
+					<key>
+						<value>TEST_STOCK_9</value>
+					</key>
+					<set>
+						<value>3</value>
+						<value>6</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+</beans>

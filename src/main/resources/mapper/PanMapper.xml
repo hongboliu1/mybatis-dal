@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bohaisoft.dal.mapper.PanMapper" >
+    <resultMap id="BaseResultMap" type="com.bohaisoft.dal.model.Pan">
+        <result column="uid" property="uid" jdbcType="VARCHAR" />
+        <result column="fileid" property="fileid" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="getPanById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select uid,fileid
+        from pan_res
+        where uid = #{id,jdbcType=VARCHAR}
+    </select>
+
+</mapper>
