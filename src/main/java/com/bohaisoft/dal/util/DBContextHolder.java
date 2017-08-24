@@ -1,7 +1,7 @@
 package com.bohaisoft.dal.util;
 
 /**
- * Created by ThinkPad on 2016/12/30.
+ * Created by liuhb on 2016/12/30.
  */
 public class DBContextHolder {
 

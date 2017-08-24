@@ -14,10 +14,10 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
- * 通过反射扩展ibatis的sqlExecutor对象
+ * 通过反射扩展mybatis的sqlExecutor对象
  *
- * @author wuxiang
- * @since 2013-1-7
+ * @author liuhb
+ * @since 2017-1-7
  */
 public class SqlMapExtensibleImpl implements SqlMapExtensible {
 

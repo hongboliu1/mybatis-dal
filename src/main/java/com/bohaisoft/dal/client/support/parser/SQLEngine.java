@@ -156,6 +156,9 @@ public class SQLEngine {
             try {
                 BoundSql boundSql = stmt.getBoundSql(wrapCollection(parameterObject));
                 sql = boundSql.getSql();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("getTableNamesByStatementName sql : {} ",sql);
+                }
                 result = SQLEngine.getInstance().getTableNameSet(sql);
             } catch (Exception e) {
 				/*
@@ -188,7 +191,7 @@ public class SQLEngine {
             }
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("statement:" + statementName + ", tables:" + result);
+            logger.debug("statement: {} , tables: {}",statementName ,result);
         }
         return result;
     }
